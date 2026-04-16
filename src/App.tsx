@@ -34,6 +34,7 @@ import AcademicPulse from './components/AcademicPulse';
 import Profile from './components/Profile';
 import JourneyTracker from './components/JourneyTracker';
 import Avatar from './components/Avatar';
+import scholarlyLogo from '../logo-content.png';
 
 const NotificationsDropdown = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const notifications = [
@@ -85,12 +86,18 @@ const Navbar = ({ activeTab, setActiveTab, onSignIn, onStartQuiz }: { activeTab:
   return (
     <nav className="bg-white/80 backdrop-blur-md shadow-sm fixed top-0 w-full z-50">
       <div className="flex justify-between items-center max-w-7xl mx-auto px-6 h-16">
-        <div 
-          className="text-xl font-bold tracking-tighter text-zinc-900 font-headline cursor-pointer"
+        <button
+          type="button"
+          aria-label="Scholarly home"
+          className="flex items-center justify-center shrink-0 cursor-pointer"
           onClick={() => setActiveTab('home')}
         >
-          Scholarly
-        </div>
+          <img
+            src={scholarlyLogo}
+            alt="Scholarly"
+            className="h-14 w-auto object-contain"
+          />
+        </button>
         <div className="hidden md:flex items-center space-x-8 font-sans text-sm tracking-tight">
           <button 
             className={`${activeTab === 'home' ? 'text-primary font-bold border-b-2 border-primary' : 'text-zinc-500'} hover:text-primary transition-colors pb-1`}
