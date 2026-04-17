@@ -207,7 +207,7 @@ const Hero = () => (
           Secondary School Quiz Competition
         </div>
         <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter text-on-surface mb-6 leading-tight">
-          Nigeria’s <span className="text-gradient-primary">Brightest Quiz Minds.</span>
+          Ijesha’s <span className="text-gradient-primary">Brightest Future Minds.</span>
         </h1>
         <p className="font-sans text-base sm:text-lg text-secondary max-w-lg mb-8 md:mb-10 leading-relaxed">
           A modern inter-school quiz platform for junior and senior secondary students. Register your school, prepare with past questions, and compete in fair, timed academic contests.
