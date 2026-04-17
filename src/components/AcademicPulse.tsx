@@ -58,16 +58,16 @@ export default function AcademicPulse() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-grow p-8 lg:p-12">
+      <main className="flex-grow p-4 sm:p-8 lg:p-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex justify-between items-start mb-12">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-6 mb-12">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2 block">Student Dashboard</span>
-              <h1 className="text-5xl font-bold font-headline text-zinc-900 tracking-tighter">Academic Pulse</h1>
+              <h1 className="text-4xl sm:text-5xl font-bold font-headline text-zinc-900 tracking-tighter">Academic Pulse</h1>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">Global Rank</span>
                 <span className="text-2xl font-black text-primary">#42</span>
               </div>
@@ -79,8 +79,8 @@ export default function AcademicPulse() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
             {/* Weekly Goal Progress */}
-            <div className="lg:col-span-8 bg-white p-10 rounded-[2.5rem] editorial-shadow relative overflow-hidden">
-              <div className="flex justify-between items-start mb-10">
+            <div className="lg:col-span-8 bg-white p-6 sm:p-10 rounded-[2.5rem] editorial-shadow relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-10">
                 <div>
                   <h3 className="text-2xl font-bold text-zinc-900 mb-2">Weekly Goal Progress</h3>
                   <p className="text-zinc-500 text-sm max-w-sm">You've completed 85% of your scheduled modules this week.</p>
@@ -117,7 +117,7 @@ export default function AcademicPulse() {
             </div>
 
             {/* Upcoming Round */}
-            <div className="lg:col-span-4 bg-primary p-10 rounded-[2.5rem] text-white editorial-shadow flex flex-col justify-between">
+            <div className="lg:col-span-4 bg-primary p-6 sm:p-10 rounded-[2.5rem] text-white editorial-shadow flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-8 block">Upcoming Round</span>
                 <h3 className="text-3xl font-bold font-headline leading-tight mb-2">Quantum Theory & Logic</h3>
@@ -132,7 +132,7 @@ export default function AcademicPulse() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Performance History */}
             <div className="lg:col-span-8 bg-zinc-100/50 p-10 rounded-[2.5rem]">
-              <div className="flex justify-between items-center mb-12">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-12">
                 <h3 className="text-xl font-bold text-zinc-900">Performance History</h3>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                   Last 30 Days
@@ -140,7 +140,7 @@ export default function AcademicPulse() {
                 </div>
               </div>
 
-              <div className="flex items-end justify-between h-48 px-4">
+              <div className="flex items-end justify-between h-40 sm:h-48 px-1 sm:px-4 gap-2">
                 {[
                   { day: 'MON', val: 40 },
                   { day: 'TUE', val: 65 },
@@ -150,9 +150,9 @@ export default function AcademicPulse() {
                   { day: 'SAT', val: 70 },
                   { day: 'SUN', val: 50 }
                 ].map((bar, i) => (
-                  <div key={i} className="flex flex-col items-center gap-4 flex-1">
+                  <div key={i} className="flex flex-col items-center gap-3 sm:gap-4 flex-1 min-w-0">
                     <div 
-                      className={`w-full max-w-[40px] rounded-lg transition-all duration-500 ${bar.active ? 'bg-primary' : 'bg-zinc-200'}`}
+                      className={`w-full max-w-[28px] sm:max-w-[40px] rounded-lg transition-all duration-500 ${bar.active ? 'bg-primary' : 'bg-zinc-200'}`}
                       style={{ height: `${bar.val}%` }}
                     />
                     <span className="text-[10px] font-bold text-zinc-400">{bar.day}</span>
@@ -162,7 +162,7 @@ export default function AcademicPulse() {
             </div>
 
             {/* Achievements */}
-            <div className="lg:col-span-4 bg-white p-10 rounded-[2.5rem] border border-zinc-100">
+            <div className="lg:col-span-4 bg-white p-6 sm:p-10 rounded-[2.5rem] border border-zinc-100">
               <h3 className="text-xl font-bold text-zinc-900 mb-8">Achievements</h3>
               <div className="grid grid-cols-2 gap-4 mb-10">
                 {[

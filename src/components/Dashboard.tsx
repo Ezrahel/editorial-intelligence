@@ -16,23 +16,23 @@ export default function Dashboard() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-7xl mx-auto px-6 py-12"
+      className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12"
     >
       <div className="flex flex-col lg:flex-row justify-between items-start gap-8 mb-12">
         <div>
           <span className="font-label text-[10px] uppercase tracking-[0.2em] text-primary font-bold mb-4 block">Academic Dashboard</span>
-          <h1 className="font-headline text-6xl font-bold tracking-tighter text-zinc-900">
+          <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-zinc-900">
             Scholarly <br />
             <span className="text-primary">Pursuits.</span>
           </h1>
         </div>
         
-        <div className="flex gap-4">
-          <div className="bg-zinc-100 p-6 rounded-2xl flex flex-col justify-center min-w-[160px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto">
+          <div className="bg-zinc-100 p-6 rounded-2xl flex flex-col justify-center min-w-0">
             <span className="text-[10px] font-label uppercase tracking-widest text-zinc-400 mb-1">Global Rank</span>
             <span className="text-3xl font-black text-zinc-900">#14</span>
           </div>
-          <div className="bg-zinc-100 p-6 rounded-2xl flex flex-col justify-center min-w-[200px]">
+          <div className="bg-zinc-100 p-6 rounded-2xl flex flex-col justify-center min-w-0">
             <span className="text-[10px] font-label uppercase tracking-widest text-zinc-400 mb-1">Nigerian Sector</span>
             <span className="text-3xl font-black text-zinc-900">Osun State</span>
           </div>
@@ -43,22 +43,22 @@ export default function Dashboard() {
         <div className="lg:col-span-8 space-y-12">
           {/* Active Quizzes */}
           <section>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between gap-4 mb-8">
               <h2 className="text-2xl font-bold font-headline">Active Quizzes</h2>
-              <div className="h-[1px] flex-grow mx-8 bg-zinc-100" />
+              <div className="h-[1px] flex-grow bg-zinc-100" />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-8 rounded-[2rem] editorial-shadow border border-zinc-50 flex flex-col justify-between h-full">
+              <div className="bg-white p-6 sm:p-8 rounded-[2rem] editorial-shadow border border-zinc-50 flex flex-col justify-between h-full">
                 <div>
-                  <div className="flex justify-between items-center mb-6">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
                     <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">In Progress</span>
                     <span className="text-primary font-bold text-xs">24:12 Remaining</span>
                   </div>
                   <h3 className="text-xl font-bold mb-3">SS3 Tech League Qualifier</h3>
                   <p className="text-zinc-500 text-sm mb-8">State-wide competition focusing on advanced algorithms and cloud architecture.</p>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-4">
                   <div className="flex -space-x-2">
                     <Avatar name="Femi Adeola" variant="blue" className="w-8 h-8 rounded-full border-2 border-white text-[10px]" />
                     <Avatar name="Kehinde Aluko" variant="amber" className="w-8 h-8 rounded-full border-2 border-white text-[10px]" />
@@ -67,9 +67,9 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="bg-white p-8 rounded-[2rem] editorial-shadow border border-zinc-50 flex flex-col justify-between h-full">
+              <div className="bg-white p-6 sm:p-8 rounded-[2rem] editorial-shadow border border-zinc-50 flex flex-col justify-between h-full">
                 <div>
-                  <div className="flex justify-between items-center mb-6">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
                     <span className="bg-zinc-100 text-zinc-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Draft</span>
                     <span className="text-zinc-400 text-xs">Not Started</span>
                   </div>
@@ -83,14 +83,14 @@ export default function Dashboard() {
 
           {/* Upcoming */}
           <section>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between gap-4 mb-8">
               <h2 className="text-2xl font-bold font-headline">Upcoming</h2>
-              <div className="h-[1px] flex-grow mx-8 bg-zinc-100" />
+              <div className="h-[1px] flex-grow bg-zinc-100" />
             </div>
             
             <div className="space-y-4">
-              <div className="bg-zinc-50 p-6 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-white hover:editorial-shadow transition-all">
-                <div className="flex items-center gap-6">
+              <div className="bg-zinc-50 p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer hover:bg-white hover:editorial-shadow transition-all">
+                <div className="flex items-center gap-4 sm:gap-6">
                   <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
                     <Calendar size={24} />
                   </div>
@@ -102,8 +102,8 @@ export default function Dashboard() {
                 <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">Register Interest</button>
               </div>
 
-              <div className="bg-zinc-50 p-6 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-white hover:editorial-shadow transition-all">
-                <div className="flex items-center gap-6">
+              <div className="bg-zinc-50 p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer hover:bg-white hover:editorial-shadow transition-all">
+                <div className="flex items-center gap-4 sm:gap-6">
                   <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
                     <ShieldCheck size={24} />
                   </div>
@@ -120,12 +120,12 @@ export default function Dashboard() {
 
         {/* Sidebar Stats */}
         <div className="lg:col-span-4 space-y-8">
-          <div className="bg-primary p-10 rounded-[2rem] text-white relative overflow-hidden editorial-shadow">
+          <div className="bg-primary p-8 sm:p-10 rounded-[2rem] text-white relative overflow-hidden editorial-shadow">
             <div className="relative z-10">
               <span className="text-[10px] font-label uppercase tracking-widest opacity-60 mb-2 block">Total Excellence</span>
               <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-5xl font-black">482</span>
-                <span className="text-xl opacity-60">Points</span>
+                <span className="text-4xl sm:text-5xl font-black">482</span>
+                <span className="text-lg sm:text-xl opacity-60">Points</span>
               </div>
               <div className="w-full bg-white/20 h-1.5 rounded-full mb-2">
                 <div className="bg-white h-full w-[85%] rounded-full" />
@@ -135,7 +135,7 @@ export default function Dashboard() {
             <Trophy className="absolute -bottom-4 -right-4 text-white/10" size={160} strokeWidth={1} />
           </div>
 
-          <div className="bg-zinc-50 p-8 rounded-[2rem]">
+          <div className="bg-zinc-50 p-6 sm:p-8 rounded-[2rem]">
             <h3 className="text-lg font-bold mb-8">Recent Achievements</h3>
             <div className="space-y-8">
               {[

@@ -69,18 +69,18 @@ export default function JourneyTracker() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-7xl mx-auto px-6 py-12"
+      className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12"
     >
       <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16">
         <div>
           <span className="font-label text-[10px] uppercase tracking-[0.2em] text-primary font-bold mb-4 block">Scholarly Path</span>
-          <h1 className="font-headline text-6xl font-bold tracking-tighter text-zinc-900">
+          <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-zinc-900">
             The Digital <br />
             <span className="text-primary italic">Scholar Journey.</span>
           </h1>
         </div>
         
-        <div className="bg-zinc-900 p-8 rounded-[2.5rem] text-white editorial-shadow min-w-[300px]">
+        <div className="bg-zinc-900 p-6 sm:p-8 rounded-[2.5rem] text-white editorial-shadow w-full md:w-auto md:min-w-[300px]">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
               <Trophy size={24} />
@@ -106,13 +106,13 @@ export default function JourneyTracker() {
         </div>
       </div>
 
-      <div className="space-y-24 relative">
+      <div className="space-y-16 md:space-y-24 relative">
         {/* Connector Line */}
         <div className="absolute left-[23px] top-8 bottom-8 w-0.5 bg-zinc-100 hidden md:block" />
 
         {journeyData.map((tier, tierIdx) => (
           <div key={tier.id} className="relative">
-            <div className="flex items-center gap-6 mb-12 relative z-10">
+            <div className="flex items-center gap-4 sm:gap-6 mb-8 sm:mb-12 relative z-10">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 border-white editorial-shadow ${
                 tier.status === 'completed' ? 'bg-green-500 text-white' :
                 tier.status === 'current' ? 'bg-primary text-white' :
@@ -123,7 +123,7 @@ export default function JourneyTracker() {
                  <Lock size={20} />}
               </div>
               <div>
-                <h2 className={`text-3xl font-bold font-headline ${tier.status === 'locked' ? 'text-zinc-300' : 'text-zinc-900'}`}>
+                <h2 className={`text-2xl sm:text-3xl font-bold font-headline ${tier.status === 'locked' ? 'text-zinc-300' : 'text-zinc-900'}`}>
                   {tier.name}
                 </h2>
                 <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">
@@ -139,7 +139,7 @@ export default function JourneyTracker() {
                 <motion.div
                   key={module.id}
                   whileHover={{ y: -5 }}
-                  className={`p-8 rounded-[2.5rem] border transition-all relative overflow-hidden ${
+                  className={`p-6 sm:p-8 rounded-[2.5rem] border transition-all relative overflow-hidden ${
                     module.status === 'completed' ? 'bg-white border-zinc-100 editorial-shadow' :
                     module.status === 'current' ? 'bg-white border-primary shadow-[0_20px_40px_rgba(43,55,166,0.1)] ring-1 ring-primary/20' :
                     'bg-zinc-50 border-transparent opacity-60 grayscale'
@@ -187,10 +187,10 @@ export default function JourneyTracker() {
       </div>
 
       {/* Final Milestone */}
-      <div className="mt-32 p-12 rounded-[3.5rem] bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-center relative overflow-hidden editorial-shadow">
+      <div className="mt-20 md:mt-32 p-8 sm:p-12 rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-center relative overflow-hidden editorial-shadow">
         <div className="relative z-10 max-w-2xl mx-auto">
-          <Trophy size={64} className="mx-auto mb-8 text-primary" />
-          <h2 className="text-4xl font-bold font-headline mb-4">The Ultimate Goal: Elite Status</h2>
+          <Trophy size={56} className="mx-auto mb-6 sm:mb-8 text-primary" />
+          <h2 className="text-3xl sm:text-4xl font-bold font-headline mb-4">The Ultimate Goal: Elite Status</h2>
           <p className="text-white/60 mb-10 leading-relaxed">
             Reach the end of the journey to become a certified Digital Scholar Elite. 
             Unlock exclusive opportunities, mentorship from industry leaders, and 

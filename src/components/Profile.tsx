@@ -47,11 +47,11 @@ export default function Profile() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-5xl mx-auto px-6 py-12"
+      className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12"
     >
       {/* Profile Header */}
       <div className="relative mb-12">
-        <div className="h-48 w-full bg-gradient-to-r from-primary to-primary-container rounded-[2rem] overflow-hidden relative">
+        <div className="h-36 sm:h-48 w-full bg-gradient-to-r from-primary to-primary-container rounded-[2rem] overflow-hidden relative">
           <img 
             src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" 
             className="w-full h-full object-cover opacity-30 mix-blend-overlay"
@@ -62,9 +62,9 @@ export default function Profile() {
           </button>
         </div>
         
-        <div className="flex flex-col md:flex-row items-end gap-6 px-8 -mt-16 relative z-10">
+        <div className="flex flex-col md:flex-row items-start md:items-end gap-4 sm:gap-6 px-4 sm:px-8 -mt-12 sm:-mt-16 relative z-10">
           <div className="relative">
-            <div className="w-32 h-32 rounded-[2rem] border-4 border-white overflow-hidden bg-zinc-100 editorial-shadow">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] border-4 border-white overflow-hidden bg-zinc-100 editorial-shadow">
               <Avatar name="Adebimpe Rhoda" variant="coral" className="w-full h-full rounded-[2rem] text-4xl" />
             </div>
             <button className="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-xl border-2 border-white shadow-lg hover:scale-110 transition-all">
@@ -72,13 +72,13 @@ export default function Profile() {
             </button>
           </div>
           
-          <div className="flex-grow pb-4">
-            <h1 className="text-3xl font-bold font-headline text-zinc-900">Adebimpe Rhoda</h1>
+          <div className="flex-grow pb-2 md:pb-4 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold font-headline text-zinc-900">Adebimpe Rhoda</h1>
             <p className="text-zinc-500 font-medium">Imperial College London • Tech League Elite</p>
           </div>
           
-          <div className="pb-4">
-            <button className="bg-zinc-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center gap-2">
+          <div className="pb-0 md:pb-4 w-full md:w-auto">
+            <button className="w-full md:w-auto bg-zinc-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center justify-center gap-2">
               <LogOut size={16} />
               Sign Out
             </button>
@@ -87,12 +87,12 @@ export default function Profile() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex gap-2 bg-zinc-100 p-1.5 rounded-2xl mb-12 w-fit">
+      <div className="flex gap-2 bg-zinc-100 p-1.5 rounded-2xl mb-12 w-full overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveSubTab(tab.id as any)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeSubTab === tab.id ? 'bg-white text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+            className={`shrink-0 flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeSubTab === tab.id ? 'bg-white text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
           >
             <tab.icon size={18} />
             {tab.label}
@@ -156,7 +156,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
+            className="bg-white p-6 sm:p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
           >
             <h3 className="text-2xl font-bold">General Settings</h3>
             
@@ -200,7 +200,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
+            className="bg-white p-6 sm:p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
           >
             <h3 className="text-2xl font-bold">Security & Privacy</h3>
             
@@ -239,7 +239,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
+            className="bg-white p-6 sm:p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
           >
             <h3 className="text-2xl font-bold">Notification Preferences</h3>
             
@@ -283,13 +283,13 @@ export default function Profile() {
 
 function InfoItem({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-4 min-w-0">
       <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400">
         <Icon size={20} />
       </div>
-      <div>
+      <div className="min-w-0">
         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block mb-1">{label}</span>
-        <span className="font-bold text-zinc-900">{value}</span>
+        <span className="font-bold text-zinc-900 break-words">{value}</span>
       </div>
     </div>
   );
@@ -306,26 +306,26 @@ function StatItem({ label, value }: { label: string, value: string }) {
 
 function SettingToggle({ icon: Icon, title, desc, enabled, isSelect, onToggle }: { icon?: any, title: string, desc: string, enabled?: boolean, isSelect?: boolean, onToggle?: () => void }) {
   return (
-    <div className="flex items-center justify-between group">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+      <div className="flex items-center gap-4 min-w-0">
         {Icon && (
           <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 group-hover:bg-primary/5 group-hover:text-primary transition-all">
             <Icon size={20} />
           </div>
         )}
-        <div>
+        <div className="min-w-0">
           <h4 className="font-bold text-zinc-900">{title}</h4>
           <p className="text-sm text-zinc-500">{desc}</p>
         </div>
       </div>
       {isSelect ? (
-        <button className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-primary transition-all">
+        <button className="self-start sm:self-auto flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-primary transition-all">
           Edit <ChevronRight size={16} />
         </button>
       ) : (
         <button 
           onClick={onToggle}
-          className={`w-12 h-6 rounded-full relative transition-all ${enabled ? 'bg-primary' : 'bg-zinc-200'}`}
+          className={`self-start sm:self-auto w-12 h-6 rounded-full relative transition-all ${enabled ? 'bg-primary' : 'bg-zinc-200'}`}
         >
           <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${enabled ? 'right-1' : 'left-1'}`} />
         </button>
@@ -336,7 +336,7 @@ function SettingToggle({ icon: Icon, title, desc, enabled, isSelect, onToggle }:
 
 function SessionItem({ device, location, time }: { device: string, location: string, time: string }) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-50">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-zinc-50">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-zinc-400">
           <Smartphone size={20} />

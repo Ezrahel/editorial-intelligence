@@ -13,6 +13,13 @@ import {
 import Avatar from './Avatar';
 
 export default function Leaderboard() {
+  const rankingRows = [
+    { rank: '04', name: 'Aluko Kehinde', variant: 'blue' as const, inst: 'Ilesha Grammar School', score: '94%', pts: '10,540' },
+    { rank: '05', name: 'Olawumi Joy', variant: 'plum' as const, inst: 'Ijebu-Jesha Grammar School', score: '97%', pts: '9,820' },
+    { rank: '06', name: 'Ifedayo Teniola', variant: 'amber' as const, inst: 'King`s College', score: '89%', pts: '9,115' },
+    { rank: '07', name: 'Bolaji-kowe Israel', variant: 'emerald' as const, inst: 'Olashoore Int`l School', score: '92%', pts: '8,990' }
+  ];
+
   return (
     <div className="flex min-h-screen bg-zinc-50 font-sans">
       {/* Sidebar - Left */}
@@ -56,25 +63,25 @@ export default function Leaderboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-grow p-8 lg:p-12">
+      <main className="flex-grow p-4 sm:p-8 lg:p-12">
         <div className="max-w-5xl mx-auto">
           <div className="mb-12">
             <span className="bg-blue-100 text-blue-600 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 inline-block">Season 04 • Live Rankings</span>
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
               <div>
-                <h1 className="text-5xl font-bold font-headline text-zinc-900 tracking-tighter mb-2">The Intelligence</h1>
-                <h2 className="text-5xl font-bold font-headline text-primary italic tracking-tighter">League</h2>
+                <h1 className="text-4xl sm:text-5xl font-bold font-headline text-zinc-900 tracking-tighter mb-2">The Intelligence</h1>
+                <h2 className="text-4xl sm:text-5xl font-bold font-headline text-primary italic tracking-tighter">League</h2>
               </div>
-              <p className="max-w-md text-zinc-400 text-sm text-right leading-relaxed">
+              <p className="max-w-md text-zinc-400 text-sm md:text-right leading-relaxed">
                 Global leaderboard for the top editorial researchers and tech-savvy scholars. Calculated based on accuracy, speed, and difficulty level of quizzes completed.
               </p>
             </div>
           </div>
 
           {/* Podium */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-end mb-16">
             {/* Rank 2 */}
-            <div className="bg-white p-8 rounded-[2rem] editorial-shadow text-center relative order-2 md:order-1">
+            <div className="bg-white p-6 sm:p-8 rounded-[2rem] editorial-shadow text-center relative order-2 md:order-1">
               <div className="relative w-24 h-24 mx-auto mb-6">
                 <Avatar name="Sijuwade Lawrence" variant="amber" className="w-full h-full rounded-2xl text-3xl" />
                 <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold text-sm">2</div>
@@ -85,7 +92,7 @@ export default function Leaderboard() {
             </div>
 
             {/* Rank 1 */}
-            <div className="bg-white p-10 rounded-[2.5rem] border-4 border-primary editorial-shadow text-center relative z-10 scale-110 order-1 md:order-2">
+            <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] border-4 border-primary editorial-shadow text-center relative z-10 md:scale-110 order-1 md:order-2">
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white p-2 rounded-full">
                 <div className="bg-yellow-400 text-white w-10 h-10 rounded-full flex items-center justify-center">
                   <Trophy size={20} />
@@ -93,7 +100,7 @@ export default function Leaderboard() {
               </div>
               <div className="relative w-32 h-32 mx-auto mb-6">
                 <Avatar name="Adebimpe Rhoda" variant="coral" className="w-full h-full rounded-3xl text-4xl" />
-                <div className="absolute -bottom-3 -right-3 bg-primary text-white px-4 py-1.5 rounded-lg font-bold text-xs uppercase tracking-widest">Rank #1</div>
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-3 bg-primary text-white px-4 py-1.5 rounded-lg font-bold text-xs uppercase tracking-widest whitespace-nowrap">Rank #1</div>
               </div>
               <h3 className="text-xl font-bold text-zinc-900 mb-1">Adebimpe Rhoda</h3>
               <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-6">Olashoore International School</p>
@@ -116,7 +123,7 @@ export default function Leaderboard() {
             </div>
 
             {/* Rank 3 */}
-            <div className="bg-white p-8 rounded-[2rem] editorial-shadow text-center relative order-3">
+            <div className="bg-white p-6 sm:p-8 rounded-[2rem] editorial-shadow text-center relative order-3">
               <div className="relative w-24 h-24 mx-auto mb-6">
                 <Avatar name="Amos Ayomide" variant="teal" className="w-full h-full rounded-2xl text-3xl" />
                 <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold text-sm">3</div>
@@ -129,17 +136,44 @@ export default function Leaderboard() {
 
           {/* Standard Rankings Table */}
           <div className="bg-white rounded-[2rem] editorial-shadow overflow-hidden">
-            <div className="p-8 border-b border-zinc-100 flex justify-between items-center">
+            <div className="p-6 sm:p-8 border-b border-zinc-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
               <h3 className="font-bold text-zinc-900">Standard Rankings</h3>
-              <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest">
+              <div className="flex gap-4 sm:gap-6 text-[10px] font-bold uppercase tracking-widest overflow-x-auto w-full sm:w-auto no-scrollbar">
                 <button className="text-primary border-b-2 border-primary pb-1">Overall</button>
                 <button className="text-zinc-400 hover:text-zinc-600">By School</button>
                 <button className="text-zinc-400 hover:text-zinc-600">By Department</button>
               </div>
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="space-y-4 p-4 sm:hidden">
+              {rankingRows.map((row, i) => (
+                <article key={i} className="rounded-[1.5rem] border border-zinc-100 p-4">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar name={row.name} variant={row.variant} className="w-12 h-12 rounded-xl shrink-0" />
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-zinc-900 break-words">{row.name}</h4>
+                        <p className="text-xs text-zinc-500">{row.inst}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-black text-primary">#{row.rank}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-xl bg-zinc-50 p-3">
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Last Quiz</span>
+                      <span className="inline-flex bg-blue-100 text-blue-600 px-2.5 py-1 rounded-lg text-[10px] font-bold">{row.score}</span>
+                    </div>
+                    <div className="rounded-xl bg-zinc-50 p-3">
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Total Points</span>
+                      <span className="font-black text-zinc-900">{row.pts}</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full min-w-[720px]">
                 <thead>
                   <tr className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 text-left">
                     <th className="px-8 py-6">Rank</th>
@@ -150,18 +184,13 @@ export default function Leaderboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-50">
-                  {[
-                    { rank: '04', name: 'Aluko Kehinde', variant: 'blue' as const, inst: 'Ilesha Grammar School', score: '94%', pts: '10,540' },
-                    { rank: '05', name: 'Olawumi Joy', variant: 'plum' as const, inst: 'Ijebu-Jesha Grammar School', score: '97%', pts: '9,820' },
-                    { rank: '06', name: 'Ifedayo Teniola', variant: 'amber' as const, inst: 'King`s College', score: '89%', pts: '9,115' },
-                    { rank: '07', name: 'Bolaji-kowe Israel', variant: 'emerald' as const, inst: 'Olashoore Int`l School', score: '92%', pts: '8,990' }
-                  ].map((row, i) => (
+                  {rankingRows.map((row, i) => (
                     <tr key={i} className="group hover:bg-zinc-50 transition-all">
                       <td className="px-8 py-6 font-bold text-zinc-400">{row.rank}</td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
                           <Avatar name={row.name} variant={row.variant} className="w-10 h-10 rounded-lg" />
-                          <span className="font-bold text-zinc-900">{row.name}</span>
+                          <span className="font-bold text-zinc-900 whitespace-nowrap">{row.name}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-zinc-500 text-sm">{row.inst}</td>

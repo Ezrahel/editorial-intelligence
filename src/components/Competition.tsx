@@ -114,30 +114,30 @@ export default function Competition() {
       </div>
 
       {/* Quiz Header */}
-      <div className="bg-white border-b border-zinc-100 p-8 pt-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <div className="bg-white border-b border-zinc-100 px-4 sm:px-8 py-6 sm:py-8 pt-8 sm:pt-10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 sm:gap-8">
           <div>
             <span className="bg-blue-100 text-blue-600 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 inline-block">Computer Studies (WASSCE)</span>
-            <h1 className="text-5xl font-bold font-headline text-zinc-900 tracking-tighter">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-headline text-zinc-900 tracking-tighter">
               Competition <span className="text-primary italic">Tier III</span>
             </h1>
           </div>
           
-          <div className="flex gap-12">
-            <div className="text-right">
+          <div className="grid grid-cols-2 gap-4 sm:gap-8 w-full md:w-auto">
+            <div className="text-left md:text-right">
               <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest block mb-1">Total Time Remaining</span>
-              <span className="text-4xl font-black text-primary">{formatTime(totalTime)}</span>
+              <span className="text-2xl sm:text-3xl md:text-4xl font-black text-primary">{formatTime(totalTime)}</span>
             </div>
-            <div className="text-right">
+            <div className="text-left md:text-right">
               <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest block mb-1">Current Score</span>
-              <span className="text-4xl font-black text-zinc-900">850</span>
+              <span className="text-2xl sm:text-3xl md:text-4xl font-black text-zinc-900">850</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Progress Bar & Question Timer */}
-      <div className="max-w-7xl mx-auto px-8 mt-8 grid grid-cols-1 md:grid-cols-4 gap-8 items-end">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-8 items-end">
         <div className="md:col-span-3">
           <div className="flex justify-between items-center mb-4">
             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Question {(currentQuestionIdx + 1).toString().padStart(2, '0')} / {totalQuestions}</span>
@@ -151,8 +151,8 @@ export default function Competition() {
             />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-2xl editorial-shadow border border-zinc-50 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="bg-white p-4 rounded-2xl editorial-shadow border border-zinc-50 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
               <Clock size={16} />
             </div>
@@ -164,11 +164,11 @@ export default function Competition() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Question Section */}
-          <div className="lg:col-span-8 bg-white p-12 rounded-[3rem] editorial-shadow">
-            <h2 className="text-3xl font-bold font-headline text-zinc-900 leading-tight mb-12">
+          <div className="lg:col-span-8 bg-white p-6 sm:p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] editorial-shadow">
+            <h2 className="text-2xl sm:text-3xl font-bold font-headline text-zinc-900 leading-tight mb-8 md:mb-12">
               {currentQuestion.text}
             </h2>
 
@@ -177,7 +177,7 @@ export default function Competition() {
                 <div 
                   key={opt.id}
                   onClick={() => setSelectedOption(opt.id)}
-                  className={`p-6 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-6 ${selectedOption === opt.id ? 'border-primary bg-blue-50/50' : 'border-zinc-50 hover:border-zinc-100'}`}
+                  className={`p-4 sm:p-6 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 sm:gap-6 ${selectedOption === opt.id ? 'border-primary bg-blue-50/50' : 'border-zinc-50 hover:border-zinc-100'}`}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedOption === opt.id ? 'border-primary bg-primary' : 'border-zinc-200'}`}>
                     {selectedOption === opt.id && <div className="w-2 h-2 bg-white rounded-full" />}
@@ -187,22 +187,22 @@ export default function Competition() {
               ))}
             </div>
 
-            <div className="mt-16 flex justify-between items-center">
+            <div className="mt-10 md:mt-16 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
               <button className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-zinc-600 transition-all">
                 <AlertCircle size={18} />
                 Report Issue
               </button>
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full sm:w-auto">
                 <button 
                   onClick={handleNextQuestion}
-                  className="px-10 py-4 bg-zinc-100 text-zinc-500 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-all"
+                  className="px-6 sm:px-10 py-4 bg-zinc-100 text-zinc-500 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-all"
                 >
                   Skip Question
                 </button>
                 <button 
                   onClick={handleNextQuestion}
                   disabled={!selectedOption}
-                  className={`px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all editorial-shadow ${
+                  className={`px-6 sm:px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all editorial-shadow ${
                     selectedOption 
                       ? 'bg-primary text-white hover:bg-primary-container' 
                       : 'bg-zinc-100 text-zinc-300 cursor-not-allowed'
@@ -216,7 +216,7 @@ export default function Competition() {
 
           {/* Sidebar Analytics */}
           <div className="lg:col-span-4 space-y-8">
-            <div className="bg-zinc-100 p-8 rounded-[2.5rem]">
+            <div className="bg-zinc-100 p-6 sm:p-8 rounded-[2.5rem]">
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-8">Subject Analytics</h3>
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -246,18 +246,18 @@ export default function Competition() {
             <div className="bg-zinc-900 rounded-[2.5rem] overflow-hidden relative group">
               <img 
                 src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2070&auto=format&fit=crop" 
-                className="w-full h-64 object-cover opacity-50 group-hover:scale-110 transition-all duration-700"
+                className="w-full h-48 sm:h-64 object-cover opacity-50 group-hover:scale-110 transition-all duration-700"
                 alt="Quantum Visualization"
               />
-              <div className="absolute inset-0 p-8 flex flex-col justify-end">
+              <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2 block">Educational Resource</span>
                 <p className="text-xs text-white/80 leading-relaxed">Basic computer system architecture and data networking concepts</p>
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-[2.5rem] border border-zinc-100">
+            <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-zinc-100">
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-6">Hotkeys</h3>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex items-center gap-2">
                   <span className="bg-zinc-100 px-2 py-1 rounded text-[10px] font-mono font-bold">1-4</span>
                   <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Select</span>

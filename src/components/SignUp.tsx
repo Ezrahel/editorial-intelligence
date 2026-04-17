@@ -51,9 +51,9 @@ export default function SignUp({ onLogin, onSignUp }: SignUpProps) {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center px-8 md:px-24 py-12">
+      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center px-4 sm:px-8 md:px-24 py-8 sm:py-12">
         <div className="max-w-md w-full mx-auto">
-          <div className="mb-12">
+          <div className="mb-10 sm:mb-12">
             <h1 className="text-primary font-bold italic tracking-tighter text-xl mb-1">THE DIGITAL SCHOLAR</h1>
             <p className="text-zinc-400 font-label text-[10px] uppercase tracking-[0.2em] mb-8">Nigeria's Academic Frontier</p>
             
@@ -122,7 +122,7 @@ export default function SignUp({ onLogin, onSignUp }: SignUpProps) {
             Already an elite member? <button onClick={onLogin} className="text-primary font-bold hover:underline">Log in here</button>
           </p>
 
-          <div className="mt-24 flex justify-between items-center text-[10px] font-label uppercase tracking-widest text-zinc-400">
+          <div className="mt-16 sm:mt-24 flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-[10px] font-label uppercase tracking-widest text-zinc-400">
             <span>© 2026 TDS Excellence</span>
             <div className="flex gap-4">
               <a href="#" className="hover:text-primary">Privacy</a>
