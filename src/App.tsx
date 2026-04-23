@@ -294,7 +294,7 @@ const Hero = () => (
         className="flex-1 text-left z-10"
       >
         <div className="inline-block px-3 py-1 bg-tertiary-fixed text-tertiary rounded-full font-label text-[10px] uppercase tracking-[0.2em] mb-6">
-          Secondary School Quiz Competition
+          Unlock chance to win the Ijesha Tech Price
         </div>
         <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter text-on-surface mb-6 leading-tight">
           Ijesha’s <span className="text-gradient-primary">Brightest Future Minds.</span>
@@ -742,9 +742,10 @@ export default function App() {
       return;
     }
 
+    const client = supabase!;
     let isMounted = true;
 
-    void supabase.auth.getSession().then(({ data }) => {
+    void client.auth.getSession().then(({ data }) => {
       if (!isMounted) {
         return;
       }
@@ -763,7 +764,7 @@ export default function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = client.auth.onAuthStateChange((_event, session) => {
       setAuthUser(
         session?.user
           ? {
@@ -787,12 +788,13 @@ export default function App() {
       return;
     }
 
+    const client = supabase!;
     let isCancelled = false;
 
     async function loadLeaderboard() {
       setIsLoadingLeaderboard(true);
 
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('quiz_leaderboard')
         .select('*')
         .order('total_points', { ascending: false })
@@ -846,12 +848,13 @@ export default function App() {
       return;
     }
 
+    const client = supabase!;
     let isCancelled = false;
 
     async function loadAttempts() {
       setIsLoadingAttempts(true);
 
-      const { data, error } = await supabase.rpc('get_my_quiz_attempts');
+      const { data, error } = await client.rpc('get_my_quiz_attempts');
 
       if (isCancelled) {
         return;
