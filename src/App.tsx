@@ -25,17 +25,83 @@ import {
   Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SignUp from './components/SignUp';
-import AcademicProfile from './components/AcademicProfile';
 import Dashboard from './components/Dashboard';
 import Leaderboard from './components/Leaderboard';
-import Competition from './components/Competition';
 import AcademicPulse from './components/AcademicPulse';
 import Profile from './components/Profile';
 import JourneyTracker from './components/JourneyTracker';
 import Avatar from './components/Avatar';
+import TechQuiz from './components/TechQuiz';
+import { isSupabaseConfigured, supabase } from './lib/supabase';
+import {
+  fallbackLeaderboardRows,
+  type AuthUser,
+  type LeaderboardEntry,
+  type QuizAttempt,
+} from './lib/scholar';
 import scholarlyLogo from '../logo-content.png';
+
+type AppView = 'landing' | 'signup' | 'quiz';
+type AppTab = 'home' | 'resources' | 'dashboard' | 'leaderboard' | 'journey' | 'pulse' | 'profile';
+type AuthTarget = 'landing' | 'quiz' | 'profile';
+
+function getRouteState(pathname: string): {
+  view: AppView;
+  activeTab: AppTab;
+  authTarget: AuthTarget;
+} {
+  switch (pathname) {
+    case '/signup':
+      return { view: 'signup', activeTab: 'home', authTarget: 'landing' };
+    case '/quiz':
+      return { view: 'quiz', activeTab: 'home', authTarget: 'quiz' };
+    case '/resources':
+      return { view: 'landing', activeTab: 'resources', authTarget: 'landing' };
+    case '/dashboard':
+      return { view: 'landing', activeTab: 'dashboard', authTarget: 'landing' };
+    case '/leaderboard':
+      return { view: 'landing', activeTab: 'leaderboard', authTarget: 'landing' };
+    case '/journey':
+      return { view: 'landing', activeTab: 'journey', authTarget: 'landing' };
+    case '/pulse':
+      return { view: 'landing', activeTab: 'pulse', authTarget: 'landing' };
+    case '/profile':
+      return { view: 'landing', activeTab: 'profile', authTarget: 'profile' };
+    case '/':
+    default:
+      return { view: 'landing', activeTab: 'home', authTarget: 'landing' };
+  }
+}
+
+function getPathForRoute(view: AppView, activeTab: AppTab) {
+  if (view === 'signup') {
+    return '/signup';
+  }
+
+  if (view === 'quiz') {
+    return '/quiz';
+  }
+
+  switch (activeTab) {
+    case 'resources':
+      return '/resources';
+    case 'dashboard':
+      return '/dashboard';
+    case 'leaderboard':
+      return '/leaderboard';
+    case 'journey':
+      return '/journey';
+    case 'pulse':
+      return '/pulse';
+    case 'profile':
+      return '/profile';
+    case 'home':
+    default:
+      return '/';
+  }
+}
 
 const NotificationsDropdown = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const notifications = [
@@ -81,10 +147,22 @@ const NotificationsDropdown = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
   );
 };
 
-const Navbar = ({ activeTab, setActiveTab, onSignIn, onStartQuiz }: { activeTab: string, setActiveTab: (tab: string) => void, onSignIn: () => void, onStartQuiz: () => void }) => {
+const Navbar = ({
+  activeTab,
+  setActiveTab,
+  onSignIn,
+  onStartQuiz,
+  isAuthenticated,
+}: {
+  activeTab: AppTab,
+  setActiveTab: (tab: AppTab) => void,
+  onSignIn: () => void,
+  onStartQuiz: () => void,
+  isAuthenticated: boolean,
+}) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const tabs = [
+  const tabs: Array<{ id: AppTab; label: string }> = [
     { id: 'home', label: 'Home' },
     { id: 'leaderboard', label: 'Leaderboard' },
     { id: 'journey', label: 'Stages' },
@@ -133,14 +211,16 @@ const Navbar = ({ activeTab, setActiveTab, onSignIn, onStartQuiz }: { activeTab:
               </button>
             ))}
           </div>
-          <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-stretch">
             <div className="relative">
               <button 
                 onClick={() => {
                   setIsNotifOpen(!isNotifOpen);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`${isNotifOpen ? 'text-primary' : 'text-zinc-500'} hover:text-primary transition-colors relative`}
+                className={`${
+                  isNotifOpen ? 'text-primary' : 'text-zinc-500'
+                } relative inline-flex h-10 w-10 items-center justify-center self-center rounded-full hover:bg-zinc-100 hover:text-primary transition-colors`}
               >
                 <Bell size={20} />
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
@@ -148,14 +228,24 @@ const Navbar = ({ activeTab, setActiveTab, onSignIn, onStartQuiz }: { activeTab:
               <NotificationsDropdown isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
             </div>
             <button 
-              className={`${activeTab === 'profile' ? 'text-primary' : 'text-zinc-500'} hover:text-primary transition-colors`}
-              onClick={() => setActiveTab('profile')}
+              className={`${
+                activeTab === 'profile' ? 'text-primary' : 'text-zinc-500'
+              } inline-flex h-10 w-10 items-center justify-center self-center rounded-full hover:bg-zinc-100 hover:text-primary transition-colors`}
+              onClick={() => {
+                if (isAuthenticated) {
+                  setActiveTab('profile');
+                  setIsMobileMenuOpen(false);
+                  return;
+                }
+
+                onSignIn();
+              }}
             >
               <UserCircle size={24} />
             </button>
             <button 
               onClick={onStartQuiz}
-              className="bg-primary hover:bg-primary-container text-white px-3 sm:px-5 py-2 rounded-full font-label text-[10px] uppercase tracking-widest transition-all duration-200"
+              className="inline-flex h-10 items-center justify-center self-center bg-primary hover:bg-primary-container text-white px-3 sm:px-5 rounded-full font-label text-[10px] uppercase tracking-widest transition-all duration-200"
             >
               <span className="hidden sm:inline">Start Quiz</span>
               <span className="sm:hidden">Quiz</span>
@@ -586,44 +676,270 @@ const Footer = () => (
 );
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [view, setView] = useState<'landing' | 'signup' | 'profile' | 'competition'>('landing');
+  const [activeTab, setActiveTab] = useState<AppTab>(() =>
+    typeof window === 'undefined' ? 'home' : getRouteState(window.location.pathname).activeTab,
+  );
+  const [view, setView] = useState<AppView>(() =>
+    typeof window === 'undefined' ? 'landing' : getRouteState(window.location.pathname).view,
+  );
+  const [authTarget, setAuthTarget] = useState<AuthTarget>(() =>
+    typeof window === 'undefined' ? 'landing' : getRouteState(window.location.pathname).authTarget,
+  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser>(null);
+  const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
+  const [isLoadingAttempts, setIsLoadingAttempts] = useState(false);
+  const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const syncFromLocation = () => {
+      const routeState = getRouteState(window.location.pathname);
+      setView(routeState.view);
+      setActiveTab(routeState.activeTab);
+      setAuthTarget(routeState.authTarget);
+    };
+
+    syncFromLocation();
+
+    const recoveryHash = new URLSearchParams(
+      window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash,
+    );
+
+    if (recoveryHash.get('type') === 'recovery') {
+      setAuthTarget('landing');
+      setView('signup');
+    }
+
+    window.addEventListener('popstate', syncFromLocation);
+
+    return () => {
+      window.removeEventListener('popstate', syncFromLocation);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const nextPath = getPathForRoute(view, activeTab);
+    const currentPath = window.location.pathname;
+
+    if (currentPath !== nextPath) {
+      window.history.pushState({}, '', nextPath);
+    }
+  }, [activeTab, view]);
+
+  useEffect(() => {
+    if (!supabase || !isSupabaseConfigured) {
+      setLeaderboardEntries(fallbackLeaderboardRows);
+      setIsLoadingLeaderboard(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    void supabase.auth.getSession().then(({ data }) => {
+      if (!isMounted) {
+        return;
+      }
+
+      setAuthUser(
+        data.session?.user
+          ? {
+              id: data.session.user.id,
+              email: data.session.user.email ?? null,
+              user_metadata: data.session.user.user_metadata,
+            }
+          : null,
+      );
+      setIsAuthenticated(Boolean(data.session?.user));
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(
+        session?.user
+          ? {
+              id: session.user.id,
+              email: session.user.email ?? null,
+              user_metadata: session.user.user_metadata,
+            }
+          : null,
+      );
+      setIsAuthenticated(Boolean(session?.user));
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!supabase || !isSupabaseConfigured) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    async function loadLeaderboard() {
+      setIsLoadingLeaderboard(true);
+
+      const { data, error } = await supabase
+        .from('quiz_leaderboard')
+        .select('*')
+        .order('total_points', { ascending: false })
+        .order('average_percentage', { ascending: false });
+
+      if (isCancelled) {
+        return;
+      }
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        setLeaderboardEntries(
+          data.map((entry) => ({
+            user_id: String((entry as LeaderboardEntry).user_id),
+            full_name: String((entry as LeaderboardEntry).full_name ?? 'Scholar'),
+            school_name:
+              typeof (entry as LeaderboardEntry).school_name === 'string'
+                ? (entry as LeaderboardEntry).school_name
+                : null,
+            grade_level:
+              typeof (entry as LeaderboardEntry).grade_level === 'string'
+                ? (entry as LeaderboardEntry).grade_level
+                : null,
+            attempts_count: Number((entry as LeaderboardEntry).attempts_count ?? 0),
+            total_points: Number((entry as LeaderboardEntry).total_points ?? 0),
+            average_percentage: Number((entry as LeaderboardEntry).average_percentage ?? 0),
+            best_score: Number((entry as LeaderboardEntry).best_score ?? 0),
+            last_completed_at:
+              typeof (entry as LeaderboardEntry).last_completed_at === 'string'
+                ? (entry as LeaderboardEntry).last_completed_at
+                : null,
+          })),
+        );
+      } else {
+        setLeaderboardEntries(fallbackLeaderboardRows);
+      }
+
+      setIsLoadingLeaderboard(false);
+    }
+
+    void loadLeaderboard();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authUser || !supabase) {
+      setQuizAttempts([]);
+      setIsLoadingAttempts(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    async function loadAttempts() {
+      setIsLoadingAttempts(true);
+
+      const { data, error } = await supabase.rpc('get_my_quiz_attempts');
+
+      if (isCancelled) {
+        return;
+      }
+
+      if (!error && Array.isArray(data)) {
+        setQuizAttempts(
+          data.map((attempt) => ({
+            session_token: String((attempt as QuizAttempt).session_token),
+            score: Number((attempt as QuizAttempt).score ?? 0),
+            total_questions: Number((attempt as QuizAttempt).total_questions ?? 0),
+            answered_questions: Number((attempt as QuizAttempt).answered_questions ?? 0),
+            completed_at: String((attempt as QuizAttempt).completed_at ?? ''),
+            auto_submitted: Boolean((attempt as QuizAttempt).auto_submitted),
+          })),
+        );
+      } else {
+        setQuizAttempts([]);
+      }
+
+      setIsLoadingAttempts(false);
+    }
+
+    void loadAttempts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [authUser]);
+
+  const openAuth = (target: AuthTarget = 'landing') => {
+    setAuthTarget(target);
+    setView('signup');
+  };
+
+  const handleAuthenticated = () => {
+    if (authTarget === 'quiz') {
+      setView('quiz');
+      return;
+    }
+
+    setView('landing');
+
+    if (authTarget === 'profile') {
+      setActiveTab('profile');
+    }
+  };
+
+  const handleSignOut = async () => {
+    if (!supabase) {
+      return;
+    }
+
+    await supabase.auth.signOut();
+    setActiveTab('home');
+    setView('landing');
+  };
 
   if (view === 'signup') {
     return (
-      <SignUp 
-        onLogin={() => setView('landing')} 
-        onSignUp={() => setView('profile')} 
+      <SignUp
+        onAuthenticated={handleAuthenticated}
+        onCancel={() => setView(authTarget === 'quiz' ? 'quiz' : 'landing')}
       />
     );
   }
 
-  if (view === 'profile') {
-    return (
-      <AcademicProfile 
-        onBack={() => setView('signup')} 
-        onFinish={() => setView('landing')} 
-      />
-    );
-  }
-
-  if (view === 'competition') {
+  if (view === 'quiz') {
     return (
       <div className="min-h-screen bg-zinc-50">
         <Navbar 
           activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          onSignIn={() => setView('signup')}
-          onStartQuiz={() => setView('competition')}
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            setView('landing');
+          }}
+          onSignIn={() => openAuth('quiz')}
+          onStartQuiz={() => setView('quiz')}
+          isAuthenticated={isAuthenticated}
         />
         <div className="pt-16">
-          <Competition />
+          <TechQuiz onRequireAuth={() => openAuth('quiz')} />
           <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 flex justify-center">
             <button 
               onClick={() => setView('landing')}
               className="text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-primary transition-all"
             >
-              Exit Competition
+              Exit Quiz
             </button>
           </div>
         </div>
@@ -636,8 +952,9 @@ export default function App() {
       <Navbar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
-        onSignIn={() => setView('signup')}
-        onStartQuiz={() => setView('competition')}
+        onSignIn={() => openAuth('profile')}
+        onStartQuiz={() => setView('quiz')}
+        isAuthenticated={isAuthenticated}
       />
       <main className="pt-16">
         <AnimatePresence mode="wait">
@@ -674,7 +991,12 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <Dashboard />
+              <Dashboard
+                user={authUser}
+                attempts={quizAttempts}
+                leaderboardEntries={leaderboardEntries}
+                isLoading={isLoadingAttempts || isLoadingLeaderboard}
+              />
             </motion.div>
           )}
           {activeTab === 'leaderboard' && (
@@ -685,7 +1007,12 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <Leaderboard />
+              <Leaderboard
+                currentUser={authUser}
+                entries={leaderboardEntries}
+                currentUserId={authUser?.id ?? null}
+                isLoading={isLoadingLeaderboard}
+              />
             </motion.div>
           )}
           {activeTab === 'journey' && (
@@ -696,7 +1023,11 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <JourneyTracker />
+              <JourneyTracker
+                user={authUser}
+                attempts={quizAttempts}
+                leaderboardEntries={leaderboardEntries}
+              />
             </motion.div>
           )}
           {activeTab === 'pulse' && (
@@ -707,7 +1038,12 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <AcademicPulse />
+              <AcademicPulse
+                user={authUser}
+                attempts={quizAttempts}
+                leaderboardEntries={leaderboardEntries}
+                isLoading={isLoadingAttempts || isLoadingLeaderboard}
+              />
             </motion.div>
           )}
           {activeTab === 'profile' && (
@@ -718,7 +1054,12 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <Profile />
+              <Profile
+                user={authUser}
+                attemptsOverride={quizAttempts}
+                isLoadingAttemptsOverride={isLoadingAttempts}
+                onSignOut={handleSignOut}
+              />
             </motion.div>
           )}
         </AnimatePresence>

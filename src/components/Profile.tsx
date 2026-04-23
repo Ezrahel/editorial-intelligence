@@ -1,27 +1,44 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  User, 
-  Settings, 
-  Shield, 
-  Bell, 
-  Camera, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  GraduationCap, 
-  Code2, 
+import {
+  User,
+  Settings,
+  Shield,
+  Bell,
+  Camera,
+  Mail,
+  GraduationCap,
+  Code2,
   LogOut,
   ChevronRight,
-  Lock,
   Smartphone,
   Globe,
   Eye,
-  Trash2
+  Trash2,
+  LoaderCircle,
 } from 'lucide-react';
-import { useState, ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { useEffect, useMemo, useState, ReactNode } from 'react';
 import Avatar from './Avatar';
+import { supabase } from '../lib/supabase';
+import {
+  formatAttemptTimestamp,
+  getScholarIdentity,
+  derivePerformance,
+  type AuthUser,
+  type QuizAttempt,
+} from '../lib/scholar';
 
-export default function Profile() {
+export default function Profile({
+  user,
+  attemptsOverride,
+  isLoadingAttemptsOverride,
+  onSignOut,
+}: {
+  user: AuthUser;
+  attemptsOverride?: QuizAttempt[];
+  isLoadingAttemptsOverride?: boolean;
+  onSignOut: () => Promise<void> | void;
+}) {
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'settings' | 'security' | 'notifications'>('overview');
   const [settings, setSettings] = useState({
     publicProfile: true,
@@ -29,12 +46,80 @@ export default function Profile() {
     upcomingQuizzes: true,
     quizResults: true,
     securityAlerts: true,
-    productUpdates: false
+    productUpdates: false,
   });
+  const [attempts, setAttempts] = useState<QuizAttempt[]>(attemptsOverride ?? []);
+  const [isLoadingAttempts, setIsLoadingAttempts] = useState(
+    typeof isLoadingAttemptsOverride === 'boolean' ? isLoadingAttemptsOverride : Boolean(user),
+  );
 
   const toggleSetting = (key: keyof typeof settings) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  useEffect(() => {
+    if (attemptsOverride) {
+      setAttempts(attemptsOverride);
+    }
+  }, [attemptsOverride]);
+
+  useEffect(() => {
+    if (typeof isLoadingAttemptsOverride === 'boolean') {
+      setIsLoadingAttempts(isLoadingAttemptsOverride);
+    }
+  }, [isLoadingAttemptsOverride]);
+
+  useEffect(() => {
+    if (attemptsOverride || typeof isLoadingAttemptsOverride === 'boolean') {
+      return;
+    }
+
+    if (!user || !supabase) {
+      setAttempts([]);
+      setIsLoadingAttempts(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    async function loadAttempts() {
+      setIsLoadingAttempts(true);
+
+      const { data, error } = await supabase.rpc('get_my_quiz_attempts');
+
+      if (!isCancelled) {
+        if (!error && Array.isArray(data)) {
+          setAttempts(
+            data.map((attempt) => ({
+              session_token: String((attempt as QuizAttempt).session_token),
+              score: Number((attempt as QuizAttempt).score ?? 0),
+              total_questions: Number((attempt as QuizAttempt).total_questions ?? 0),
+              answered_questions: Number((attempt as QuizAttempt).answered_questions ?? 0),
+              completed_at: String((attempt as QuizAttempt).completed_at ?? ''),
+              auto_submitted: Boolean((attempt as QuizAttempt).auto_submitted),
+            })),
+          );
+        } else {
+          setAttempts([]);
+        }
+
+        setIsLoadingAttempts(false);
+      }
+    }
+
+    void loadAttempts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isLoadingAttemptsOverride, attemptsOverride, user]);
+
+  const { fullName, schoolName, gradeLevel } = useMemo(() => getScholarIdentity(user), [user]);
+  const { completedCount, averageAccuracy, bestScore, latestAttemptAt } = useMemo(
+    () => derivePerformance(attempts),
+    [attempts],
+  );
+  const latestAttempt = formatAttemptTimestamp(latestAttemptAt);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
@@ -43,17 +128,29 @@ export default function Profile() {
     { id: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+        <div className="rounded-[2rem] border border-zinc-200 bg-white p-8 editorial-shadow">
+          <h1 className="font-headline text-3xl font-bold text-zinc-900">Profile unavailable</h1>
+          <p className="mt-3 text-secondary">
+            Sign in first so your quiz attempts, leaderboard standing, and scholar profile can load.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12"
     >
-      {/* Profile Header */}
       <div className="relative mb-12">
         <div className="h-36 sm:h-48 w-full bg-gradient-to-r from-primary to-primary-container rounded-[2rem] overflow-hidden relative">
-          <img 
-            src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" 
+          <img
+            src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop"
             className="w-full h-full object-cover opacity-30 mix-blend-overlay"
             alt="Cover"
           />
@@ -61,24 +158,30 @@ export default function Profile() {
             <Camera size={20} />
           </button>
         </div>
-        
+
         <div className="flex flex-col md:flex-row items-start md:items-end gap-4 sm:gap-6 px-4 sm:px-8 -mt-12 sm:-mt-16 relative z-10">
           <div className="relative">
             <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] border-4 border-white overflow-hidden bg-zinc-100 editorial-shadow">
-              <Avatar name="Adebimpe Rhoda" variant="coral" className="w-full h-full rounded-[2rem] text-4xl" />
+              <Avatar name={fullName} variant="coral" className="w-full h-full rounded-[2rem] text-4xl" />
             </div>
             <button className="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-xl border-2 border-white shadow-lg hover:scale-110 transition-all">
               <Camera size={16} />
             </button>
           </div>
-          
-          <div className="flex-grow pb-2 md:pb-4 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold font-headline text-zinc-900">Adebimpe Rhoda</h1>
-            <p className="text-zinc-500 font-medium">Imperial College London • Tech League Elite</p>
+
+          <div className="flex-grow pt-2 sm:pt-3 md:pt-0 pb-2 md:pb-4 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold font-headline text-zinc-900">{fullName}</h1>
+            <p className="text-zinc-500 font-medium">
+              {schoolName} • {gradeLevel}
+            </p>
           </div>
-          
+
           <div className="pb-0 md:pb-4 w-full md:w-auto">
-            <button className="w-full md:w-auto bg-zinc-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => void onSignOut()}
+              className="w-full md:w-auto bg-zinc-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"
+            >
               <LogOut size={16} />
               Sign Out
             </button>
@@ -86,13 +189,14 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Tabs Navigation */}
       <div className="flex gap-2 bg-zinc-100 p-1.5 rounded-2xl mb-12 w-full overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveSubTab(tab.id as any)}
-            className={`shrink-0 flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeSubTab === tab.id ? 'bg-white text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+            onClick={() => setActiveSubTab(tab.id as 'overview' | 'settings' | 'security' | 'notifications')}
+            className={`shrink-0 flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl text-sm font-bold transition-all ${
+              activeSubTab === tab.id ? 'bg-white text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
+            }`}
           >
             <tab.icon size={18} />
             {tab.label}
@@ -113,37 +217,48 @@ export default function Profile() {
               <div className="bg-white p-8 rounded-[2rem] editorial-shadow border border-zinc-50">
                 <h3 className="text-xl font-bold mb-6">Personal Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InfoItem icon={User} label="Full Name" value="Adebimpe Rhoda" />
-                  <InfoItem icon={Mail} label="Email Address" value="Adebimpe.rhoda@olashooreIntschool.com" />
-                  <InfoItem icon={Phone} label="Phone Number" value="+234 90 7589 5111" />
-                  <InfoItem icon={MapPin} label="Location" value="Iloko, Ijesha" />
+                  <InfoItem icon={User} label="Full Name" value={fullName} />
+                  <InfoItem icon={Mail} label="Email Address" value={user.email ?? 'No email on file'} />
+                  <InfoItem icon={GraduationCap} label="School Name" value={schoolName} />
+                  <InfoItem icon={Code2} label="Grade Level" value={gradeLevel} />
                 </div>
               </div>
 
               <div className="bg-white p-8 rounded-[2rem] editorial-shadow border border-zinc-50">
-                <h3 className="text-xl font-bold mb-6">Academic Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InfoItem icon={GraduationCap} label="Institution" value="Olashoore International School" />
-                  <InfoItem icon={Code2} label="Tech Track" value="Data Science & ML" />
-                  <InfoItem icon={User} label="Grade Level" value="Postgraduate" />
-                  <InfoItem icon={Shield} label="Member Status" value="Elite League" />
-                </div>
+                <h3 className="text-xl font-bold mb-6">Quiz Performance</h3>
+                {isLoadingAttempts ? (
+                  <div className="flex items-center gap-3 text-zinc-500">
+                    <LoaderCircle size={18} className="animate-spin text-primary" />
+                    <span className="text-sm">Loading your claimed quiz history...</span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InfoItem icon={Shield} label="Submitted Attempts" value={String(completedCount)} />
+                    <InfoItem icon={Eye} label="Average Accuracy" value={`${averageAccuracy}%`} />
+                    <InfoItem icon={Smartphone} label="Best Score" value={`${bestScore}/50`} />
+                    <InfoItem icon={Bell} label="Latest Attempt" value={latestAttempt} />
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="space-y-8">
               <div className="bg-primary p-8 rounded-[2rem] text-white editorial-shadow">
-                <h3 className="font-bold mb-4">Membership</h3>
-                <p className="text-white/70 text-sm mb-6">You are currently on the <span className="text-white font-bold">Elite Pro</span> plan. Your next renewal is on Oct 24, 2026.</p>
-                <button className="w-full bg-white text-primary py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-50 transition-all">Manage Plan</button>
+                <h3 className="font-bold mb-4">Account Status</h3>
+                <p className="text-white/70 text-sm mb-6">
+                  Your authenticated scholar account is now eligible to claim guest quiz attempts and appear on the public leaderboard.
+                </p>
+                <button className="w-full bg-white text-primary py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-50 transition-all">
+                  Account Active
+                </button>
               </div>
-              
+
               <div className="bg-zinc-900 p-8 rounded-[2rem] text-white editorial-shadow">
                 <h3 className="font-bold mb-4">Quick Stats</h3>
                 <div className="space-y-4">
-                  <StatItem label="Quizzes Completed" value="482" />
-                  <StatItem label="Avg. Accuracy" value="98.4%" />
-                  <StatItem label="Global Rank" value="#14" />
+                  <StatItem label="Quizzes Completed" value={String(completedCount)} />
+                  <StatItem label="Avg. Accuracy" value={`${averageAccuracy}%`} />
+                  <StatItem label="Best Score" value={`${bestScore}/50`} />
                 </div>
               </div>
             </div>
@@ -159,33 +274,30 @@ export default function Profile() {
             className="bg-white p-6 sm:p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
           >
             <h3 className="text-2xl font-bold">General Settings</h3>
-            
+
             <div className="space-y-6">
-              <SettingToggle 
-                icon={Eye} 
-                title="Public Profile" 
-                desc="Allow other scholars to see your achievements and rank." 
-                enabled={settings.publicProfile} 
+              <SettingToggle
+                icon={Eye}
+                title="Public Profile"
+                desc="Allow your leaderboard identity and school to be visible."
+                enabled={settings.publicProfile}
                 onToggle={() => toggleSetting('publicProfile')}
               />
-              <SettingToggle 
-                icon={Globe} 
-                title="Language" 
-                desc="English (UK)" 
-                isSelect 
-              />
-              <SettingToggle 
-                icon={Smartphone} 
-                title="Two-Factor Authentication" 
-                desc="Add an extra layer of security to your account." 
-                enabled={settings.twoFactor} 
+              <SettingToggle icon={Globe} title="Language" desc="English (UK)" isSelect />
+              <SettingToggle
+                icon={Smartphone}
+                title="Two-Factor Authentication"
+                desc="Turn this on inside Supabase auth providers when you are ready."
+                enabled={settings.twoFactor}
                 onToggle={() => toggleSetting('twoFactor')}
               />
             </div>
 
             <div className="pt-10 border-t border-zinc-100">
               <h4 className="text-red-500 font-bold mb-4">Danger Zone</h4>
-              <p className="text-zinc-500 text-sm mb-6">Once you delete your account, there is no going back. Please be certain.</p>
+              <p className="text-zinc-500 text-sm mb-6">
+                Profile edits are metadata-backed. Account deletion should be handled from your auth provider once enabled.
+              </p>
               <button className="flex items-center gap-2 text-red-500 font-bold hover:bg-red-50 px-4 py-2 rounded-lg transition-all">
                 <Trash2 size={18} />
                 Delete Account
@@ -203,21 +315,33 @@ export default function Profile() {
             className="bg-white p-6 sm:p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
           >
             <h3 className="text-2xl font-bold">Security & Privacy</h3>
-            
-            <form className="space-y-6 max-w-md" onSubmit={(e) => e.preventDefault()}>
+
+            <form className="space-y-6 max-w-md" onSubmit={(event) => event.preventDefault()}>
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Current Password</label>
-                <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-zinc-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 outline-none" />
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={user.email ?? ''}
+                  disabled
+                  className="w-full px-4 py-3 bg-zinc-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 outline-none"
+                />
               </div>
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">New Password</label>
-                <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-zinc-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 outline-none" />
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value="********"
+                  disabled
+                  className="w-full px-4 py-3 bg-zinc-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 outline-none"
+                />
               </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Confirm New Password</label>
-                <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-zinc-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 outline-none" />
-              </div>
-              <button className="bg-primary text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary-container transition-all">Update Password</button>
+              <button className="bg-primary text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary-container transition-all">
+                Managed By Supabase Auth
+              </button>
             </form>
 
             <div className="pt-10 border-t border-zinc-100">
@@ -226,8 +350,7 @@ export default function Profile() {
                 Active Sessions
               </h4>
               <div className="space-y-4">
-                <SessionItem device="MacBook Pro" location="London, UK" time="Active Now" />
-                <SessionItem device="iPhone 15 Pro" location="London, UK" time="2 hours ago" />
+                <SessionItem device="Current Browser Session" location="Authenticated" time="Active Now" />
               </div>
             </div>
           </motion.div>
@@ -242,34 +365,34 @@ export default function Profile() {
             className="bg-white p-6 sm:p-10 rounded-[2rem] editorial-shadow border border-zinc-50 space-y-10"
           >
             <h3 className="text-2xl font-bold">Notification Preferences</h3>
-            
+
             <div className="space-y-8">
               <NotificationGroup title="Quiz Alerts">
-                <SettingToggle 
-                  title="Upcoming Quizzes" 
-                  desc="Get notified when a new quiz is about to start." 
-                  enabled={settings.upcomingQuizzes} 
+                <SettingToggle
+                  title="Upcoming Quizzes"
+                  desc="Get notified when a new quiz is about to start."
+                  enabled={settings.upcomingQuizzes}
                   onToggle={() => toggleSetting('upcomingQuizzes')}
                 />
-                <SettingToggle 
-                  title="Quiz Results" 
-                  desc="Receive your performance report immediately after a quiz." 
-                  enabled={settings.quizResults} 
+                <SettingToggle
+                  title="Quiz Results"
+                  desc="Receive your performance report after your attempt is attached to your account."
+                  enabled={settings.quizResults}
                   onToggle={() => toggleSetting('quizResults')}
                 />
               </NotificationGroup>
 
               <NotificationGroup title="Account Activity">
-                <SettingToggle 
-                  title="Security Alerts" 
-                  desc="Get notified of new logins or security changes." 
-                  enabled={settings.securityAlerts} 
+                <SettingToggle
+                  title="Security Alerts"
+                  desc="Get notified of new logins or security changes."
+                  enabled={settings.securityAlerts}
                   onToggle={() => toggleSetting('securityAlerts')}
                 />
-                <SettingToggle 
-                  title="Product Updates" 
-                  desc="Stay informed about new features and resources." 
-                  enabled={settings.productUpdates} 
+                <SettingToggle
+                  title="Product Updates"
+                  desc="Stay informed about new features and resources."
+                  enabled={settings.productUpdates}
                   onToggle={() => toggleSetting('productUpdates')}
                 />
               </NotificationGroup>
@@ -281,7 +404,7 @@ export default function Profile() {
   );
 }
 
-function InfoItem({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
+function InfoItem({ icon: Icon, label, value }: { icon: LucideIcon, label: string, value: string }) {
   return (
     <div className="flex items-start gap-4 min-w-0">
       <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400">
@@ -304,15 +427,29 @@ function StatItem({ label, value }: { label: string, value: string }) {
   );
 }
 
-function SettingToggle({ icon: Icon, title, desc, enabled, isSelect, onToggle }: { icon?: any, title: string, desc: string, enabled?: boolean, isSelect?: boolean, onToggle?: () => void }) {
+function SettingToggle({
+  icon: Icon,
+  title,
+  desc,
+  enabled,
+  isSelect,
+  onToggle,
+}: {
+  icon?: LucideIcon,
+  title: string,
+  desc: string,
+  enabled?: boolean,
+  isSelect?: boolean,
+  onToggle?: () => void,
+}) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
       <div className="flex items-center gap-4 min-w-0">
-        {Icon && (
+        {Icon ? (
           <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 group-hover:bg-primary/5 group-hover:text-primary transition-all">
             <Icon size={20} />
           </div>
-        )}
+        ) : null}
         <div className="min-w-0">
           <h4 className="font-bold text-zinc-900">{title}</h4>
           <p className="text-sm text-zinc-500">{desc}</p>
@@ -323,7 +460,8 @@ function SettingToggle({ icon: Icon, title, desc, enabled, isSelect, onToggle }:
           Edit <ChevronRight size={16} />
         </button>
       ) : (
-        <button 
+        <button
+          type="button"
           onClick={onToggle}
           className={`self-start sm:self-auto w-12 h-6 rounded-full relative transition-all ${enabled ? 'bg-primary' : 'bg-zinc-200'}`}
         >
@@ -346,7 +484,9 @@ function SessionItem({ device, location, time }: { device: string, location: str
           <p className="text-xs text-zinc-500">{location}</p>
         </div>
       </div>
-      <span className={`text-[10px] font-bold uppercase tracking-widest ${time === 'Active Now' ? 'text-green-500' : 'text-zinc-400'}`}>{time}</span>
+      <span className={`text-[10px] font-bold uppercase tracking-widest ${time === 'Active Now' ? 'text-green-500' : 'text-zinc-400'}`}>
+        {time}
+      </span>
     </div>
   );
 }
@@ -355,9 +495,7 @@ function NotificationGroup({ title, children }: { title: string, children: React
   return (
     <div className="space-y-4">
       <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{title}</h4>
-      <div className="space-y-4">
-        {children}
-      </div>
+      <div className="space-y-4">{children}</div>
     </div>
   );
 }
