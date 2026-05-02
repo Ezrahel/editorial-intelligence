@@ -35,6 +35,8 @@ import JourneyTracker from './components/JourneyTracker';
 import Avatar from './components/Avatar';
 import TechQuiz from './components/TechQuiz';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
+import schoolHeroImage from '../nig-school.png';
+import prideCoverImage from '../ban.png';
 import {
   fallbackLeaderboardRows,
   type AuthUser,
@@ -320,7 +322,7 @@ const Hero = () => (
         <div className="relative w-full max-w-xl mx-auto aspect-square rounded-[2rem] overflow-hidden editorial-shadow bg-zinc-100">
           <img 
             className="w-full h-full object-cover" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAsjEFSsL5tO_oLizdr9jXWTT_OFt_UNg1DNnxTtez_5ZSj_xFjevFLzDqeve9P0qFV9D8AIC4wg_SPL--nCdSoYoyoLUouk4kQYpOffckttvlGayg-tkCfpOZMS5Mp9G_nmeYK7NwWNwFuUAqmG8qdjFnnNmBk6abx_UcQKH7EoP0alDKzR8MtuEfzZ4_3IyqBPhxNglWl9J8L74OSxlG8Ts9LZyUm7xDmS_U5r_Y-9oEEmkQPhJpeLd6Q6Ob-3640NDhUht_ZzbL" 
+            src={schoolHeroImage} 
             alt="Students participating in a school quiz competition"
             referrerPolicy="no-referrer"
           />
@@ -403,8 +405,8 @@ const Rewards = () => (
         >
           <img 
             className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOhvC70mJC_AkbddWR4banS07K39jZq6CnW2GFr210mYW8UHDN9av8MmqnIZnEcxZEd-zAWrU8rBGRz4vLG711QaYWFLKzV0g1rSL80roMNR9g1cCvFPLIrwQQ7f9vxsiPj2MoH9k17vxKqEiG3nGA0klLI7tszLwSS7tYi48r_dHQeZpNHNmg6VVnETt4hTWMxdFQyL75qYT3xGeuUpsn9fHa8yXbTJP_tNVZF-J0VzzuiSJlrPFhVYl5nExDpx-07iqTU-Je1HKW" 
-            alt="Network of Peers"
+            src={prideCoverImage} 
+            alt="Students celebrating school pride and community"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-primary/40 flex flex-col justify-end p-10">
