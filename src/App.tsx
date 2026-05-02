@@ -303,9 +303,9 @@ const Hero = () => (
           A modern inter-school quiz platform for junior and senior secondary students. Register your school, prepare with past questions, and compete in fair, timed academic contests.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
-          <button className="bg-gradient-to-br from-primary to-primary-container text-white px-6 sm:px-8 py-4 rounded-full font-headline font-bold text-base sm:text-lg editorial-shadow transition-transform hover:scale-[1.02] active:scale-95">
+          <a href="https://ijeshadigitalhub.com/itp" className="inline-flex items-center justify-center bg-gradient-to-br from-primary to-primary-container text-white px-6 sm:px-8 py-4 rounded-full font-headline font-bold text-base sm:text-lg editorial-shadow transition-transform hover:scale-[1.02] active:scale-95">
             Register Your School
-          </button>
+          </a>
           <button className="bg-zinc-200 text-primary px-6 sm:px-8 py-4 rounded-full font-headline font-bold text-base sm:text-lg hover:bg-zinc-300 transition-colors">
             View Competition Stages
           </button>
