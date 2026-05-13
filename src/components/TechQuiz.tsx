@@ -450,6 +450,10 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
   }, [isAuthenticated]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStep, result]);
+
+  useEffect(() => {
     if (isLoading || isSubmitting || result || questions.length === 0) {
       return;
     }
@@ -522,7 +526,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
   if (result) {
     const percentage =
       result.total_questions === 0 ? 0 : Math.round((result.score / result.total_questions) * 100);
-    const shouldHideDetailedResults = result.requires_auth_to_view && !isAuthenticated;
+    const shouldHideDetailedResults = false;
 
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-8">
@@ -533,130 +537,94 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
                 Quiz Submitted
               </p>
               <h1 className="font-headline text-3xl md:text-4xl font-bold tracking-tight text-on-surface">
-                {shouldHideDetailedResults ? 'Quiz Attempt Saved' : 'Tech Quiz Results'}
+                Tech Quiz Results
               </h1>
               <p className="mt-3 max-w-2xl text-secondary">
-                {shouldHideDetailedResults
-                  ? 'Your guest quiz attempt has been stored in a claimable session. Sign in or create an account to map it to your profile, keep the record safe, and unlock the full result.'
-                  : 'This attempt is now attached to your account and can feed your leaderboard standing and profile stats.'}
+                This attempt is now attached to your account and can feed your leaderboard standing and profile stats.
               </p>
             </div>
-            {shouldHideDetailedResults ? (
-              <button
-                type="button"
-                onClick={() => onRequireAuth?.()}
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-container"
-              >
-                <LogIn size={16} />
-                Login / Sign Up
-              </button>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto">
-                <div className="rounded-[1.75rem] bg-zinc-50 px-5 py-4">
-                  <p className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-400">Score</p>
-                  <p className="mt-2 font-headline text-3xl font-bold text-primary">
-                    {result.score}/{result.total_questions}
-                  </p>
-                </div>
-                <div className="rounded-[1.75rem] bg-zinc-50 px-5 py-4">
-                  <p className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-400">Percentage</p>
-                  <p className="mt-2 font-headline text-3xl font-bold text-zinc-900">{percentage}%</p>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto">
+              <div className="rounded-[1.75rem] bg-zinc-50 px-5 py-4">
+                <p className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-400">Score</p>
+                <p className="mt-2 font-headline text-3xl font-bold text-primary">
+                  {result.score}/{result.total_questions}
+                </p>
               </div>
-            )}
+              <div className="rounded-[1.75rem] bg-zinc-50 px-5 py-4">
+                <p className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-400">Percentage</p>
+                <p className="mt-2 font-headline text-3xl font-bold text-zinc-900">{percentage}%</p>
+              </div>
+            </div>
           </div>
         </section>
 
-        {shouldHideDetailedResults ? (
-          <section className="rounded-[2rem] border border-amber-200 bg-amber-50 p-6 md:p-8 text-amber-800">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="mt-0.5 shrink-0" size={18} />
-              <div className="space-y-3">
-                <div>
-                  <h2 className="font-headline text-2xl font-bold tracking-tight">
-                    Do Not Lose This Attempt
-                  </h2>
-                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-amber-700">
-                    You submitted this quiz as a guest. Please login or sign up now so this quiz session can be mapped to your account and later reflected on your leaderboard position and profile.
-                  </p>
-                </div>
-                {isClaimingGuestAttempts ? (
-                  <p className="text-sm font-medium text-amber-700">
-                    Claiming your saved guest attempts now that you are authenticated...
-                  </p>
-                ) : null}
-              </div>
+        <section className="rounded-[2rem] bg-white p-6 md:p-8 editorial-shadow border border-zinc-100">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h2 className="font-headline text-2xl font-bold tracking-tight text-on-surface">
+                Review Section
+              </h2>
+              <p className="mt-2 text-sm text-secondary">
+                {result.missed_questions.length === 0
+                  ? 'Excellent work. You answered every question correctly.'
+                  : `You missed ${result.missed_questions.length} question${result.missed_questions.length === 1 ? '' : 's'}.`}
+              </p>
             </div>
-          </section>
-        ) : (
-          <section className="rounded-[2rem] bg-white p-6 md:p-8 editorial-shadow border border-zinc-100">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <h2 className="font-headline text-2xl font-bold tracking-tight text-on-surface">
-                  Review Section
-                </h2>
-                <p className="mt-2 text-sm text-secondary">
-                  {result.missed_questions.length === 0
-                    ? 'Excellent work. You answered every question correctly.'
-                    : `You missed ${result.missed_questions.length} question${result.missed_questions.length === 1 ? '' : 's'}.`}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleRestart}
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-zinc-200 px-5 py-3 text-sm font-bold text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-900"
-              >
-                <RotateCcw size={16} />
-                Restart Quiz
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleRestart}
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-zinc-200 px-5 py-3 text-sm font-bold text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-900"
+            >
+              <RotateCcw size={16} />
+              Restart Quiz
+            </button>
+          </div>
 
-            <div className="mt-8 space-y-5">
-              {result.missed_questions.length === 0 ? (
-                <div className="rounded-[1.75rem] bg-emerald-50 px-5 py-4 text-emerald-700">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 size={18} />
-                    <p className="text-sm font-medium">No review items this round.</p>
-                  </div>
+          <div className="mt-8 space-y-5">
+            {result.missed_questions.length === 0 ? (
+              <div className="rounded-[1.75rem] bg-emerald-50 px-5 py-4 text-emerald-700">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 size={18} />
+                  <p className="text-sm font-medium">No review items this round.</p>
                 </div>
-              ) : (
-                result.missed_questions.map((item, index) => (
-                  <article
-                    key={`${item.id}-${index}`}
-                    className="rounded-[1.75rem] border border-zinc-100 bg-zinc-50 p-5"
-                  >
-                    <p className="font-label text-[10px] uppercase tracking-[0.22em] text-zinc-400">
-                      {item.category}
+              </div>
+            ) : (
+              result.missed_questions.map((item, index) => (
+                <article
+                  key={`${item.id}-${index}`}
+                  className="rounded-[1.75rem] border border-zinc-100 bg-zinc-50 p-5"
+                >
+                  <p className="font-label text-[10px] uppercase tracking-[0.22em] text-zinc-400">
+                    {item.category}
+                  </p>
+                  <h3 className="mt-2 font-headline text-xl font-bold tracking-tight text-on-surface">
+                    {item.question_text}
+                  </h3>
+                  <div className="mt-4 grid gap-2 text-sm text-secondary">
+                    <p>
+                      Your answer:{' '}
+                      <span className="font-semibold text-zinc-800">
+                        {item.selected_option_index === null
+                          ? 'Not answered'
+                          : item.options[item.selected_option_index] ?? 'Not answered'}
+                      </span>
                     </p>
-                    <h3 className="mt-2 font-headline text-xl font-bold tracking-tight text-on-surface">
-                      {item.question_text}
-                    </h3>
-                    <div className="mt-4 grid gap-2 text-sm text-secondary">
-                      <p>
-                        Your answer:{' '}
-                        <span className="font-semibold text-zinc-800">
-                          {item.selected_option_index === null
-                            ? 'Not answered'
-                            : item.options[item.selected_option_index] ?? 'Not answered'}
-                        </span>
-                      </p>
-                      <p>
-                        Correct answer:{' '}
-                        <span className="font-semibold text-primary">
-                          {item.options[item.correct_option_index] ?? 'Unavailable'}
-                        </span>
-                      </p>
-                      <p className="leading-relaxed">
-                        Explanation:{' '}
-                        <span className="text-zinc-700">{item.explanation}</span>
-                      </p>
-                    </div>
-                  </article>
-                ))
-              )}
-            </div>
-          </section>
-        )}
+                    <p>
+                      Correct answer:{' '}
+                      <span className="font-semibold text-primary">
+                        {item.options[item.correct_option_index] ?? 'Unavailable'}
+                      </span>
+                    </p>
+                    <p className="leading-relaxed">
+                      Explanation:{' '}
+                      <span className="text-zinc-700">{item.explanation}</span>
+                    </p>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
       </div>
     );
   }
