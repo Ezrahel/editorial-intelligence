@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import TechQuiz from './components/TechQuiz';
+import SignUp from './components/SignUp';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
 import { type AuthUser } from './lib/scholar';
 import scholarlyLogo from '../logo-content.png';
@@ -7,6 +8,7 @@ import scholarlyLogo from '../logo-content.png';
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authUser, setAuthUser] = useState<AuthUser>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (!supabase || !isSupabaseConfigured) {
@@ -54,6 +56,10 @@ export default function App() {
     };
   }, []);
 
+  const openAuthModal = () => {
+    setIsAuthModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-surface">
       <nav className="bg-white/80 backdrop-blur-md shadow-sm fixed top-0 w-full z-50">
@@ -72,13 +78,22 @@ export default function App() {
                   MVP Launch: Tech Quiz
                 </span>
               </div>
+              {!isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={openAuthModal}
+                  className="rounded-full border border-primary bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-primary-container"
+                >
+                  Login / Register
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
       </nav>
 
       <main className="pt-16">
-        <TechQuiz />
+        <TechQuiz onRequireAuth={openAuthModal} />
       </main>
 
       <footer className="bg-white border-t border-zinc-100 py-12">
@@ -89,6 +104,14 @@ export default function App() {
           </p>
         </div>
       </footer>
+
+      {isAuthModalOpen ? (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 p-4 sm:p-6">
+          <div className="w-full max-w-6xl max-h-[calc(100vh-2rem)] overflow-y-auto">
+            <SignUp onAuthenticated={() => setIsAuthModalOpen(false)} onCancel={() => setIsAuthModalOpen(false)} />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

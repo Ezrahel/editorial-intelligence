@@ -801,7 +801,7 @@ export default function SignUp({ onAuthenticated, onCancel }: SignUpProps) {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-start lg:justify-center px-4 sm:px-8 md:px-24 pt-6 pb-8 sm:py-12">
+      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-start lg:justify-center px-4 sm:px-8 md:px-12 lg:px-16 pt-6 pb-8 sm:py-12">
         <div className="max-w-lg w-full mx-auto">
           <div className="mb-9 sm:mb-12">
             {screen === 'welcome' ? (
