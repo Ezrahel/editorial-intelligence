@@ -49,6 +49,12 @@ function getBackTarget(screen: AuthScreen): AuthScreen | null {
 }
 
 function getAuthRedirectUrl() {
+  const configuredAppUrl = import.meta.env.VITE_APP_URL?.trim().replace(/\/$/, '');
+
+  if (configuredAppUrl) {
+    return `${configuredAppUrl}?auth=complete`;
+  }
+
   if (typeof window === 'undefined') {
     return undefined;
   }
