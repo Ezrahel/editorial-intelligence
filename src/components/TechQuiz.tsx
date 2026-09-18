@@ -204,6 +204,26 @@ function writePendingGuestQuizResult(result: QuizSubmissionResult | null) {
   window.localStorage.setItem(GUEST_QUIZ_RESULT_STORAGE_KEY, JSON.stringify(result));
 }
 
+function getScoreEncouragement(percentage: number) {
+  if (percentage < 50) {
+    return 'Keep grinding—every attempt shows you what to practise next. Review the questions you missed and come back stronger.';
+  }
+
+  if (percentage < 70) {
+    return 'Good progress! You have a solid foundation; review the missed questions and aim even higher on your next attempt.';
+  }
+
+  if (percentage < 85) {
+    return 'Well done! You are building strong tech knowledge. A little more review can take you to an excellent score.';
+  }
+
+  if (percentage < 100) {
+    return 'Excellent work! You have a great command of the material—keep sharpening those last few areas.';
+  }
+
+  return 'Outstanding—perfect score! Your preparation and attention to detail really showed.';
+}
+
 export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void }) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [quizSessionToken, setQuizSessionToken] = useState('');
@@ -217,6 +237,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
   const [errorMessage, setErrorMessage] = useState('');
   const [submissionWarnings, setSubmissionWarnings] = useState<number[]>([]);
   const [result, setResult] = useState<QuizSubmissionResult | null>(null);
+  const [isScoreRevealed, setIsScoreRevealed] = useState(false);
   const [timeLeftInSeconds, setTimeLeftInSeconds] = useState(QUIZ_DURATION_SECONDS);
 
   const answeredQuestions = Object.keys(userAnswers).length;
@@ -307,6 +328,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
     }
 
     setResult(submissionResult);
+    setIsScoreRevealed(false);
     setIsSubmitting(false);
   }
 
@@ -349,6 +371,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
     setCurrentStep(1);
     setUserAnswers({});
     setResult(null);
+    setIsScoreRevealed(false);
     setSubmissionWarnings([]);
     setTimeLeftInSeconds(QUIZ_DURATION_SECONDS);
     setIsLoading(false);
@@ -393,6 +416,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
       setQuestions([]);
       setQuizSessionToken(storedResult.session_token);
       setResult(storedResult);
+      setIsScoreRevealed(false);
       setErrorMessage('');
       setSubmissionWarnings([]);
       setIsLoading(false);
@@ -538,7 +562,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
   if (result) {
     const percentage =
       result.total_questions === 0 ? 0 : Math.round((result.score / result.total_questions) * 100);
-    const showLoginPrompt = result.requires_auth_to_view && !isAuthenticated;
+    const scoreEncouragement = getScoreEncouragement(percentage);
 
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-8">
@@ -552,29 +576,26 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
                 Tech Quiz Results
               </h1>
               <p className="mt-3 max-w-2xl text-secondary">
-                This attempt is now attached to your account and can feed your leaderboard standing and profile stats.
+                Your result is ready. View your score, then use the review section to strengthen the areas that need more practice.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-4 w-full md:w-auto">
-              {showLoginPrompt ? (
-                <div className="rounded-[1.75rem] bg-amber-50 px-5 py-6 text-center text-amber-700">
-                  <p className="font-label text-[10px] uppercase tracking-[0.2em] text-amber-600">
-                    Sign in to view your score
+              {!isScoreRevealed ? (
+                <div className="rounded-[1.75rem] bg-primary/10 px-5 py-6 text-center text-primary">
+                  <p className="font-label text-[10px] uppercase tracking-[0.2em] text-primary">
+                    Quiz complete
                   </p>
-                  <p className="mt-3 text-sm text-amber-700">
-                    This quiz attempt is ready to be claimed. Log in or register so your score is attached to your profile, and your full result details become available.
-                  </p>
+                  <p className="mt-3 text-sm text-secondary">Your score and personalised feedback are ready.</p>
                   <button
                     type="button"
-                    onClick={handleRequireAuth}
-                    disabled={!onRequireAuth}
-                    className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-all hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={() => setIsScoreRevealed(true)}
+                    className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-all hover:bg-primary-container"
                   >
-                    View your scores
+                    View your score
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="rounded-[1.75rem] bg-zinc-50 px-5 py-4">
                     <p className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-400">Score</p>
                     <p className="mt-2 font-headline text-3xl font-bold text-primary">
@@ -585,44 +606,17 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
                     <p className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-400">Percentage</p>
                     <p className="mt-2 font-headline text-3xl font-bold text-zinc-900">{percentage}%</p>
                   </div>
+                  <div className="rounded-[1.75rem] bg-emerald-50 px-5 py-4 sm:col-span-2">
+                    <p className="font-label text-[10px] uppercase tracking-[0.2em] text-emerald-700">Keep going</p>
+                    <p className="mt-2 text-sm leading-relaxed text-emerald-900">{scoreEncouragement}</p>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </section>
 
-        {showLoginPrompt ? (
-          <section className="rounded-[2rem] bg-amber-50 p-6 md:p-8 editorial-shadow border border-amber-100">
-            <div className="flex flex-col gap-5">
-              <div>
-                <h2 className="font-headline text-2xl font-bold tracking-tight text-amber-900">
-                  Claim your result securely
-                </h2>
-                <p className="mt-2 text-sm text-amber-800">
-                  Sign in or register to save this attempt on your profile, unlock the detailed score breakdown, and appear on the leaderboard.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={handleRequireAuth}
-                  disabled={!onRequireAuth}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-all hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Log in or register
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRestart}
-                  className="inline-flex w-full items-center justify-center rounded-full border border-amber-200 bg-white px-5 py-3 text-sm font-bold text-amber-900 transition-all hover:bg-amber-100"
-                >
-                  Start another quiz
-                </button>
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="rounded-[2rem] bg-white p-6 md:p-8 editorial-shadow border border-zinc-100">
+        <section className="rounded-[2rem] bg-white p-6 md:p-8 editorial-shadow border border-zinc-100">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <h2 className="font-headline text-2xl font-bold tracking-tight text-on-surface">
@@ -688,8 +682,7 @@ export default function TechQuiz({ onRequireAuth }: { onRequireAuth?: () => void
                 ))
               )}
             </div>
-          </section>
-        )}
+        </section>
       </div>
     );
   }
