@@ -48,6 +48,14 @@ function getBackTarget(screen: AuthScreen): AuthScreen | null {
   }
 }
 
+function getAuthRedirectUrl() {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  return `${window.location.origin}${window.location.pathname}?auth=complete`;
+}
+
 export default function SignUp({ onAuthenticated, onCancel }: SignUpProps) {
   const [screen, setScreen] = useState<AuthScreen>('welcome');
   const [fullName, setFullName] = useState('');
@@ -198,7 +206,7 @@ export default function SignUp({ onAuthenticated, onCancel }: SignUpProps) {
           school_name: schoolName.trim(),
           grade_level: gradeLevel,
         },
-        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+        emailRedirectTo: getAuthRedirectUrl(),
       },
     });
 
@@ -260,7 +268,7 @@ export default function SignUp({ onAuthenticated, onCancel }: SignUpProps) {
     resetFeedback();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      redirectTo: getAuthRedirectUrl(),
     });
 
     if (error) {
@@ -273,6 +281,30 @@ export default function SignUp({ onAuthenticated, onCancel }: SignUpProps) {
     setInfoMessage(`A recovery link has been sent to ${email.trim()}. Open it to set a new password.`);
     setIsSubmitting(false);
     setScreen('check-email');
+  }
+
+  async function handleResendConfirmation() {
+    if (!supabase || !isSupabaseConfigured) {
+      setErrorMessage('Supabase auth is not configured yet. Add your project URL and anon key first.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    resetFeedback();
+
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email.trim(),
+      options: { emailRedirectTo: getAuthRedirectUrl() },
+    });
+
+    if (error) {
+      setErrorMessage(error.message);
+    } else {
+      setInfoMessage(`A fresh confirmation link has been sent to ${email.trim()}.`);
+    }
+
+    setIsSubmitting(false);
   }
 
   async function handleResetPassword(event: FormEvent<HTMLFormElement>) {
@@ -665,11 +697,22 @@ export default function SignUp({ onAuthenticated, onCancel }: SignUpProps) {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            onClick={() => changeScreen(checkEmailContext === 'signup' ? 'login' : 'forgot')}
+            onClick={checkEmailContext === 'signup' ? handleResendConfirmation : () => changeScreen('forgot')}
+            disabled={isSubmitting}
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-container"
           >
-            {checkEmailContext === 'signup' ? 'Go To Login' : 'Resend Recovery'}
+            {isSubmitting ? <LoaderCircle size={16} className="animate-spin" /> : null}
+            {checkEmailContext === 'signup' ? 'Resend Confirmation' : 'Resend Recovery'}
           </button>
+          {checkEmailContext === 'signup' ? (
+            <button
+              type="button"
+              onClick={() => changeScreen('login')}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-primary px-5 py-3 text-sm font-bold text-primary transition-colors hover:bg-primary/5"
+            >
+              Go To Login
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => changeScreen('welcome')}

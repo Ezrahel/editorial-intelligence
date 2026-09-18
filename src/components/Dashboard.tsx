@@ -14,11 +14,13 @@ export default function Dashboard({
   attempts,
   leaderboardEntries,
   isLoading,
+  onTakeAnotherTest,
 }: {
   user: AuthUser;
   attempts: QuizAttempt[];
   leaderboardEntries: LeaderboardEntry[];
   isLoading: boolean;
+  onTakeAnotherTest: () => void;
 }) {
   const insights = buildScholarInsights(user, attempts, leaderboardEntries);
   const recentAttempts = attempts.slice(0, 3);
@@ -79,8 +81,12 @@ export default function Dashboard({
                     <Avatar name={insights.fullName} variant="blue" className="w-8 h-8 rounded-full border-2 border-white text-[10px]" />
                     <Avatar name={insights.schoolName} variant="amber" className="w-8 h-8 rounded-full border-2 border-white text-[10px]" />
                   </div>
-                  <button className="w-full sm:w-auto bg-primary text-white px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-primary-container transition-all">
-                    {insights.completedCount > 0 ? 'Review Progress' : 'Start Now'}
+                  <button
+                    type="button"
+                    onClick={onTakeAnotherTest}
+                    className="w-full sm:w-auto bg-primary text-white px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-primary-container transition-all"
+                  >
+                    {insights.completedCount > 0 ? 'Take Another Test' : 'Take Your First Test'}
                   </button>
                 </div>
               </div>
